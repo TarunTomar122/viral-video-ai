@@ -11,10 +11,85 @@ type BrandData = {
   colors: string[];
   headlines: string[];
   features: string[];
-  pricing: string[];
 };
 
 type Step = "url" | "loading" | "review";
+
+function extractFromHTML(html: string, url: string): BrandData {
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(html, "text/html");
+
+  const getMeta = (prop: string) =>
+    doc.querySelector(`meta[property="${prop}"]`)?.getAttribute("content") ||
+    doc.querySelector(`meta[name="${prop}"]`)?.getAttribute("content") ||
+    "";
+
+  const title =
+    getMeta("og:title") || doc.title || doc.querySelector("h1")?.textContent?.trim() || "";
+
+  const description = getMeta("og:description") || getMeta("description") || "";
+
+  // Headlines
+  const headlines: string[] = [];
+  doc.querySelectorAll("h1, h2, h3").forEach((el) => {
+    const text = el.textContent?.trim() || "";
+    if (text.length > 5 && text.length < 200) headlines.push(text);
+  });
+
+  // Logo
+  let logo =
+    getMeta("og:image") ||
+    doc.querySelector('link[rel="icon"]')?.getAttribute("href") ||
+    doc.querySelector('link[rel="shortcut icon"]')?.getAttribute("href") ||
+    "";
+  if (logo && !logo.startsWith("http")) {
+    try {
+      logo = new URL(logo, url).href;
+    } catch {}
+  }
+
+  // Colors from all style tags and inline styles
+  const colors: string[] = [];
+  const colorRegex = /#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g;
+  let allStyle = "";
+  doc.querySelectorAll("style").forEach((el) => (allStyle += el.innerHTML));
+  doc.querySelectorAll("[style]").forEach((el) => (allStyle += el.getAttribute("style") || ""));
+  const matches = allStyle.match(colorRegex);
+  if (matches) {
+    const unique = [...new Set(matches)];
+    const meaningful = unique.filter(
+      (c) => !["#fff", "#ffffff", "#000", "#000000", "#fff"].includes(c.toLowerCase())
+    );
+    colors.push(...meaningful.slice(0, 3));
+  }
+
+  // Features
+  const features: string[] = [];
+  doc.querySelectorAll('[class*="feature"], [class*="benefit"], [class*="card"]').forEach((el) => {
+    const text = el.querySelector("h3, h4, strong")?.textContent?.trim() || "";
+    if (text.length > 3 && text.length < 120 && !features.includes(text)) {
+      features.push(text);
+    }
+  });
+
+  // Tagline
+  const tagline =
+    getMeta("og:description") ||
+    doc.querySelector(".hero h1, .hero h2, .banner h1, section:first-child h1")
+      ?.textContent?.trim() ||
+    "";
+
+  return {
+    name: title.split("—")[0]?.trim() || title.split("|")[0]?.trim() || title,
+    title: title.slice(0, 120),
+    tagline: tagline.slice(0, 200),
+    description: description.slice(0, 500),
+    logo: logo || null,
+    colors: colors.length > 0 ? colors : ["#1C1917", "#A67B5B"],
+    headlines: [...new Set(headlines)].slice(0, 8),
+    features: [...new Set(features)].slice(0, 8),
+  };
+}
 
 export default function CreatePage() {
   const [step, setStep] = useState<Step>("url");
@@ -28,22 +103,39 @@ export default function CreatePage() {
     setError("");
 
     try {
-      const res = await fetch("/api/scrape", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: url.trim() }),
-      });
+      // Use a CORS proxy to bypass restrictions
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url.trim())}`;
+      const res = await fetch(proxyUrl);
       const data = await res.json();
-      if (data.success) {
-        setBrand(data.brand);
-        setStep("review");
-      } else {
-        setError(data.error || "Failed to scrape URL");
-        setStep("url");
-      }
+      const html = data.contents || "";
+      const brandData = extractFromHTML(html, url.trim());
+      setBrand(brandData);
+      setStep("review");
     } catch {
-      setError("Something went wrong. Try again.");
-      setStep("url");
+      // Fallback: try direct fetch
+      try {
+        const res = await fetch(url.trim(), {
+          headers: { "User-Agent": "Mozilla/5.0 (compatible; ViralVideoAI/1.0)" },
+        });
+        const html = await res.text();
+        const brandData = extractFromHTML(html, url.trim());
+        setBrand(brandData);
+        setStep("review");
+      } catch {
+        // Ultimate fallback: show a mock so user can see the flow
+        const domain = new URL(url.trim()).hostname;
+        setBrand({
+          name: domain.replace("www.", "").split(".")[0] || domain,
+          title: `Welcome to ${domain}`,
+          tagline: "Your SaaS value proposition",
+          description: "We couldn't scrape this site directly. Try entering details manually in the next step.",
+          logo: `https://www.google.com/s2/favicons?domain=${domain}&sz=64`,
+          colors: ["#1C1917", "#A67B5B"],
+          headlines: ["Your main headline here"],
+          features: ["Feature 1", "Feature 2", "Feature 3"],
+        });
+        setStep("review");
+      }
     }
   };
 
@@ -53,12 +145,16 @@ export default function CreatePage() {
       <header className="glass fixed top-0 left-0 right-0 z-50 h-20 border-b border-stone-200/50">
         <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <span className="text-2xl">⚡</span>
-            <span className="font-display text-xl font-bold tracking-tight text-stone-900">
-              Viral Video AI
-            </span>
+            <a href="/viral-video-ai" className="flex items-center gap-2">
+              <span className="text-2xl">⚡</span>
+              <span className="font-display text-xl font-bold tracking-tight text-stone-900">
+                Viral Video AI
+              </span>
+            </a>
           </div>
-          <span className="text-sm font-medium text-stone-500">Step {step === "url" ? "1" : "2"} of 4</span>
+          <span className="text-sm font-medium text-stone-500">
+            Step {step === "url" ? "1" : "2"} of 4
+          </span>
         </div>
       </header>
 
@@ -113,9 +209,7 @@ export default function CreatePage() {
                     </button>
                   </div>
                 </div>
-                {error && (
-                  <p className="mt-3 text-sm text-red-500">{error}</p>
-                )}
+                {error && <p className="mt-3 text-sm text-red-500">{error}</p>}
                 <p className="mt-4 text-center text-sm text-stone-400">
                   We&apos;ll extract: brand name, colors, logo, features, and value proposition
                 </p>
@@ -128,7 +222,9 @@ export default function CreatePage() {
             <div className="flex flex-col items-center justify-center py-20">
               <div className="mb-8 h-12 w-12 animate-spin rounded-full border-3 border-stone-200 border-t-stone-900" />
               <p className="font-display text-xl font-bold text-stone-900">Analyzing your SaaS...</p>
-              <p className="mt-2 text-sm text-stone-500">Extracting brand identity, features, and messaging</p>
+              <p className="mt-2 text-sm text-stone-500">
+                Extracting brand identity, features, and messaging
+              </p>
             </div>
           )}
 
@@ -149,7 +245,6 @@ export default function CreatePage() {
 
               {/* Brand Card */}
               <div className="rounded-[24px] border-2 border-stone-200 bg-white p-8">
-                {/* Logo + Name */}
                 <div className="flex items-center gap-6">
                   {brand.logo ? (
                     <img
@@ -163,19 +258,27 @@ export default function CreatePage() {
                     </div>
                   )}
                   <div>
-                    <h2 className="font-display text-2xl font-bold text-stone-900">{brand.name}</h2>
-                    <p className="mt-1 text-stone-600">{brand.tagline || brand.description.slice(0, 100)}</p>
+                    <h2 className="font-display text-2xl font-bold text-stone-900">
+                      {brand.name}
+                    </h2>
+                    <p className="mt-1 text-stone-600">
+                      {brand.tagline || brand.description.slice(0, 100)}
+                    </p>
                   </div>
                 </div>
 
-                {/* Colors */}
                 {brand.colors.length > 0 && (
                   <div className="mt-8">
-                    <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-stone-400">Brand Colors</p>
+                    <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-stone-400">
+                      Brand Colors
+                    </p>
                     <div className="flex gap-3">
                       {brand.colors.map((c) => (
                         <div key={c} className="flex items-center gap-2">
-                          <div className="h-8 w-8 rounded-full border border-stone-200" style={{ backgroundColor: c }} />
+                          <div
+                            className="h-8 w-8 rounded-full border border-stone-200"
+                            style={{ backgroundColor: c }}
+                          />
                           <span className="text-sm text-stone-500">{c}</span>
                         </div>
                       ))}
@@ -183,18 +286,20 @@ export default function CreatePage() {
                   </div>
                 )}
 
-                {/* Description */}
                 {brand.description && (
                   <div className="mt-8">
-                    <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-stone-400">Description</p>
+                    <p className="mb-2 text-xs font-bold uppercase tracking-[0.2em] text-stone-400">
+                      Description
+                    </p>
                     <p className="text-stone-700">{brand.description}</p>
                   </div>
                 )}
 
-                {/* Headlines */}
                 {brand.headlines.length > 0 && (
                   <div className="mt-8">
-                    <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-stone-400">Key Headlines</p>
+                    <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-stone-400">
+                      Key Headlines
+                    </p>
                     <div className="space-y-2">
                       {brand.headlines.map((h, i) => (
                         <div
@@ -208,10 +313,11 @@ export default function CreatePage() {
                   </div>
                 )}
 
-                {/* Features */}
                 {brand.features.length > 0 && (
                   <div className="mt-8">
-                    <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-stone-400">Detected Features</p>
+                    <p className="mb-3 text-xs font-bold uppercase tracking-[0.2em] text-stone-400">
+                      Detected Features
+                    </p>
                     <div className="flex flex-wrap gap-2">
                       {brand.features.map((f, i) => (
                         <span
@@ -226,7 +332,6 @@ export default function CreatePage() {
                 )}
               </div>
 
-              {/* Actions */}
               <div className="flex items-center justify-between rounded-[24px] border-2 border-stone-200 bg-white p-6">
                 <div>
                   <p className="text-sm text-stone-600">Everything look right?</p>
@@ -239,7 +344,7 @@ export default function CreatePage() {
                     ← Edit
                   </button>
                   <button
-                    onClick={() => alert("Next: Video generation coming soon!")}
+                    onClick={() => alert("Step 3: Video generation coming soon!")}
                     className="rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800"
                   >
                     Generate Video →
