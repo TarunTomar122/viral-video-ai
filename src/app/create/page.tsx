@@ -104,10 +104,9 @@ export default function CreatePage() {
 
     try {
       // Use a CORS proxy to bypass restrictions
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(url.trim())}`;
+      const proxyUrl = `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url.trim())}`;
       const res = await fetch(proxyUrl);
-      const data = await res.json();
-      const html = data.contents || "";
+      const html = await res.text();
       const brandData = extractFromHTML(html, url.trim());
       setBrand(brandData);
       setStep("review");
