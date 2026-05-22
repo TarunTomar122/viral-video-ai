@@ -5,10 +5,10 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const NAV_ITEMS = [
-  { href: "/viral-video-ai/dashboard", label: "Overview", icon: "📊" },
-  { href: "/viral-video-ai/dashboard/create", label: "Create Video", icon: "🎬" },
-  { href: "/viral-video-ai/dashboard/videos", label: "My Videos", icon: "🎥" },
-  { href: "/viral-video-ai/dashboard/settings", label: "Settings", icon: "⚙️" },
+  { href: "/dashboard", label: "Overview", icon: "📊" },
+  { href: "/dashboard/create", label: "Create Video", icon: "🎬" },
+  { href: "/dashboard/videos", label: "My Videos", icon: "🎥" },
+  { href: "/dashboard/settings", label: "Settings", icon: "⚙️" },
 ];
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -24,7 +24,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         }`}
       >
         <div className="flex h-20 items-center justify-between border-b border-stone-100 px-6">
-          <Link href="/viral-video-ai" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="text-2xl">⚡</span>
             {sidebarOpen && (
               <span className="font-display text-lg font-bold tracking-tight text-stone-900">
@@ -87,7 +87,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             </h2>
             <p className="text-xs text-stone-500">
               {pathname === "/viral-video-ai/dashboard" && "Your content at a glance"}
-              {pathname === "/viral-video-ai/dashboard/create" && "Generate a new UGC video from your SaaS URL"}
+              {pathname === "/dashboard/create" && "Generate a new UGC video from your SaaS URL"}
               {pathname?.includes("videos") && "Manage your generated videos"}
               {pathname?.includes("settings") && "Manage your account"}
             </p>

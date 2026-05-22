@@ -25,7 +25,7 @@ export default function DashboardPage() {
         <h3 className="font-display text-xl font-bold text-stone-900">Quick Actions</h3>
         <div className="mt-6 grid gap-4 md:grid-cols-3">
           <Link
-            href="/viral-video-ai/dashboard/create"
+            href="/dashboard/create"
             className="card-hover rounded-[24px] border-2 border-stone-200 bg-stone-50 p-6 hover:border-stone-900"
           >
             <span className="text-3xl">🎬</span>
@@ -57,7 +57,7 @@ export default function DashboardPage() {
             Create your first video to see activity here
           </p>
           <Link
-            href="/viral-video-ai/dashboard/create"
+            href="/dashboard/create"
             className="mt-6 rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-stone-800"
           >
             Create Your First Video
