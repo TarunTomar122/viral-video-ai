@@ -7,6 +7,7 @@ import { useState } from "react";
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Overview", icon: "📊" },
   { href: "/dashboard/create", label: "Create Video", icon: "🎬" },
+  { href: "/dashboard/library", label: "Format Library", icon: "📚" },
   { href: "/dashboard/videos", label: "My Videos", icon: "🎥" },
   { href: "/dashboard/settings", label: "Settings", icon: "⚙️" },
 ];
@@ -88,6 +89,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <p className="text-xs text-stone-500">
               {pathname === "/viral-video-ai/dashboard" && "Your content at a glance"}
               {pathname === "/dashboard/create" && "Generate a new UGC video from your SaaS URL"}
+              {pathname === "/viral-video-ai/dashboard/library" && "Browse viral video formats and templates"}
               {pathname?.includes("videos") && "Manage your generated videos"}
               {pathname?.includes("settings") && "Manage your account"}
             </p>
