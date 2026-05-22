@@ -90,7 +90,7 @@ export default function Home() {
             </span>
           </div>
           <nav className="hidden items-center gap-8 md:flex">
-            <a href="#features" className="text-sm font-medium text-stone-600 transition-colors hover:text-stone-900">
+            <a href="/create" className="text-sm font-medium text-stone-600 transition-colors hover:text-stone-900">
               Features
             </a>
             <a href="#pricing" className="text-sm font-medium text-stone-600 transition-colors hover:text-stone-900">
@@ -100,9 +100,9 @@ export default function Home() {
               How It Works
             </a>
           </nav>
-          <button className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition-all hover:scale-105 hover:bg-stone-800">
+          <a href="/create" className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
             Get Started
-          </button>
+          </a>
         </div>
       </header>
 
@@ -126,9 +126,9 @@ export default function Home() {
             and schedule them on your platforms. No cameras, no actors, no scripts.
           </p>
           <div className="animate-fade-in-up-3 mt-10 flex items-center justify-center gap-4">
-            <button className="rounded-full bg-stone-900 px-8 py-3.5 text-base font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800">
+            <a href="/create" className="rounded-full bg-stone-900 px-8 py-3.5 text-base font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
               Start Free Trial
-            </button>
+            </a>
             <button className="rounded-full border-2 border-stone-300 px-8 py-3.5 text-base font-semibold text-stone-700 transition-all hover:border-stone-900 hover:text-stone-900">
               See Examples
             </button>
@@ -254,15 +254,16 @@ export default function Home() {
                     </li>
                   ))}
                 </ul>
-                <button
-                  className={`mt-8 w-full rounded-full py-3 text-sm font-semibold transition-all ${
+                <a
+                  href="/create"
+                  className={`mt-8 block w-full rounded-full py-3 text-center text-sm font-semibold transition-all ${
                     selectedPlan === plan.id
                       ? "bg-stone-900 text-white hover:bg-stone-800"
                       : "border-2 border-stone-200 text-stone-700 hover:border-stone-900"
                   }`}
                 >
                   {plan.id === "starter" ? "Start Free Trial" : "Subscribe"}
-                </button>
+                </a>
               </div>
             ))}
           </div>
@@ -334,9 +335,9 @@ export default function Home() {
             No cameras. No scripts. Just paste your URL and let AI do the work.
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
-            <button className="rounded-full bg-stone-900 px-8 py-3.5 text-base font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800">
+            <a href="/create" className="rounded-full bg-stone-900 px-8 py-3.5 text-base font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
               Start Free Trial
-            </button>
+            </a>
             <button className="rounded-full border-2 border-stone-300 px-8 py-3.5 text-base font-semibold text-stone-700 transition-all hover:border-stone-900 hover:text-stone-900">
               Book Demo
             </button>
@@ -378,9 +379,9 @@ export default function Home() {
               {PLANS.find((p) => p.id === selectedPlan)?.price}
               <span className="text-sm font-normal text-stone-500">/mo</span>
             </span>
-            <button className="rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800">
+            <a href="/create" className="rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
               Get Started
-            </button>
+            </a>
           </div>
         </div>
       </div>
