@@ -100,7 +100,7 @@ export default function Home() {
               How It Works
             </a>
           </nav>
-          <a href="/viral-video-ai/create" className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
+          <a href="/viral-video-ai/dashboard/create" className="rounded-full bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
             Get Started
           </a>
         </div>
@@ -126,7 +126,7 @@ export default function Home() {
             and schedule them on your platforms. No cameras, no actors, no scripts.
           </p>
           <div className="animate-fade-in-up-3 mt-10 flex items-center justify-center gap-4">
-            <a href="/viral-video-ai/create" className="rounded-full bg-stone-900 px-8 py-3.5 text-base font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
+            <a href="/viral-video-ai/dashboard/create" className="rounded-full bg-stone-900 px-8 py-3.5 text-base font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
               Start Free Trial
             </a>
             <button className="rounded-full border-2 border-stone-300 px-8 py-3.5 text-base font-semibold text-stone-700 transition-all hover:border-stone-900 hover:text-stone-900">
@@ -255,7 +255,7 @@ export default function Home() {
                   ))}
                 </ul>
                 <a
-                  href="/viral-video-ai/create"
+                  href="/viral-video-ai/dashboard/create"
                   className={`mt-8 block w-full rounded-full py-3 text-center text-sm font-semibold transition-all ${
                     selectedPlan === plan.id
                       ? "bg-stone-900 text-white hover:bg-stone-800"
@@ -335,7 +335,7 @@ export default function Home() {
             No cameras. No scripts. Just paste your URL and let AI do the work.
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
-            <a href="/viral-video-ai/create" className="rounded-full bg-stone-900 px-8 py-3.5 text-base font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
+            <a href="/viral-video-ai/dashboard/create" className="rounded-full bg-stone-900 px-8 py-3.5 text-base font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
               Start Free Trial
             </a>
             <button className="rounded-full border-2 border-stone-300 px-8 py-3.5 text-base font-semibold text-stone-700 transition-all hover:border-stone-900 hover:text-stone-900">
@@ -379,7 +379,7 @@ export default function Home() {
               {PLANS.find((p) => p.id === selectedPlan)?.price}
               <span className="text-sm font-normal text-stone-500">/mo</span>
             </span>
-            <a href="/viral-video-ai/create" className="rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
+            <a href="/viral-video-ai/dashboard/create" className="rounded-full bg-stone-900 px-6 py-3 text-sm font-semibold text-white transition-all hover:scale-105 hover:bg-stone-800 inline-block">
               Get Started
             </a>
           </div>
